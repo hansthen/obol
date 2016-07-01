@@ -1,0 +1,15 @@
+sudo: required
+
+language: python
+
+services:
+  - docker
+
+before_install:
+- docker pull pythea/ldap
+- docker run -d -p 127.0.0.1:389:4567 pythea/ldap 
+- docker ps -a
+- ldapmodify -a -D cn=Manager,dc=local -w system ./tests/setup.ldif
+
+script:
+- obol -w system user list
