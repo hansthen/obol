@@ -1,4 +1,4 @@
-#!/bin/python
+#!/usr/bin/env python
 from retrying import retry
 from ldif import LDIFWriter
 import sys
