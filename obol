@@ -10,8 +10,7 @@ from ConfigParser import ConfigParser
 import os
 import logging
 
-logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
-logger=logging.getLogger('obol')
+global logger
 
 def make_secret(password):
     """Encodes the given password as a base64 SSHA hash+salt buffer"""
@@ -281,6 +280,9 @@ parser.add_argument('-D', metavar="BIND DN", default='cn=Manager,dc=local')
 parser.add_argument('-w', metavar="BIND PASSWORD")
 parser.add_argument('-H', metavar="HOST", default='ldap://localhost')
 parser.add_argument('-b', metavar="BASE_DN", default='dc=local')
+loglevels = [key for key in logging._levelNames if isinstance(key, str)]
+parser.add_argument('--logLevel', choices=loglevels, default='INFO')
+
 subparsers = parser.add_subparsers(help='commands', dest='target')
 
 users = subparsers.add_parser('user', help='user commands')
@@ -344,11 +346,16 @@ command = group_commands.add_parser('list', help='list groups')
 
 
 if __name__ == '__main__':
+    global logger
     config = ConfigParser({'user_tree': 'ou=People', 
                            'group_tree': 'ou=Groups'})
     config.read(["/etc/obol/obol.config", os.path.expanduser('~/.obol.cfg')])
 
+    logger = logging.getLogger('obol')
     args = parser.parse_args()
+    logger.setLevel(args.logLevel)
+    logger.addHandler(logging.StreamHandler(sys.stdout))
+
     target = args.target
     command = args.command
     dn = args.D
@@ -370,6 +377,7 @@ if __name__ == '__main__':
         del args_d['D']
         del args_d['w']
         del args_d['H']
+        del args_d['logLevel']
         fun(**args_d)
     except Exception as e:
         print(e)
