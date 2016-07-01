@@ -2,6 +2,10 @@ sudo: required
 
 language: python
 
+python:
+  - "2.6"
+  - "2.7"
+
 services:
   - docker
 
@@ -13,5 +17,11 @@ before_install:
 - docker logs ldap
 - while ! ldapmodify -H ldap://localhost:389 -a -D cn=Manager,dc=local -w system -f ./tests/setup.ldif; do sleep 1; done
 
+install:
+- sudo python setup.py -q install 
+
 script:
 - obol -w system user list
+- obol -w system user add hans
+- obol -w system user list
+
