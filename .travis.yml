@@ -10,7 +10,7 @@ before_install:
 - docker run -d -p 127.0.0.1:389:4567 --name ldap pythea/ldap 
 - docker ps -a
 - sudo apt install ldap-utils
-- while ! ldapmodify -a -D cn=Manager,dc=local -w system -f ./tests/setup.ldif; do sleep 1; done
+- while ! ldapmodify -H ldap://localhost:4567 -a -D cn=Manager,dc=local -w system -f ./tests/setup.ldif; do sleep 1; done
 
 script:
 - obol -w system user list
