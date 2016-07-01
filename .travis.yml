@@ -18,6 +18,7 @@ before_install:
 - while ! ldapmodify -H ldap://localhost:389 -a -D cn=Manager,dc=local -w system -f ./tests/setup.ldif; do sleep 1; done
 
 install:
+- sudo pip install -r requirements.txt
 - sudo python setup.py -q install 
 
 script:
