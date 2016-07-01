@@ -2,7 +2,7 @@ from distutils.core import setup
 setup(
   name = 'obol',
   scripts = ['obol'],
-  version = '1.0',
+  version = '1.1',
   description = 'useradd for ldap',
   author = 'Hans Then',
   author_email = 'hans.then@gmail.com',
