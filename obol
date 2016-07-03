@@ -64,6 +64,7 @@ def init(b, group_tree, user_tree):
     ]
     conn.add_s(dn, add_record)
 
+
 def user_add(context, b, username, uidNumber, cn, sn, givenName, password,
              shell, groups):
     """Add a user to the LDAP"""
@@ -343,8 +344,10 @@ groups = subparsers.add_parser('group', help='group commands')
 group_commands = groups.add_subparsers(dest='command')
 
 init_cmd = subparsers.add_parser('init', help='initialize a tree')
-init_cmd.add_argument('--user_tree', default=default('user_tree', 'ou=People'))
-init_cmd.add_argument('--group_tree', default=default('group_tree', 'ou=Group'))
+init_cmd.add_argument('--user_tree',
+                      default=default('user_tree', 'ou=People'))
+init_cmd.add_argument('--group_tree',
+                      default=default('group_tree', 'ou=Group'))
 
 
 # Do the user commands
