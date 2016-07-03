@@ -39,7 +39,7 @@ def user_add(config, b, username, uidNumber, cn, sn, givenName, password, shell,
         uidNumber = increment_uid(config, b)
 
     # first add the group
-    dn = 'cn=%s,%s,%s' % (username, config.get('default', 'group_tree'), b)
+    dn = 'cn=%s,%s,%s' % (username, default('group_tree', 'ou=Groups'), b)
     logger.debug(dn)
     add_record = [
      ('objectclass', ['top', 'posixGroup']),
@@ -50,7 +50,7 @@ def user_add(config, b, username, uidNumber, cn, sn, givenName, password, shell,
     conn.add_s(dn, add_record)
 
     # now add the user
-    dn = 'uid=%s,%s,%s' % (username, config.get('default', 'user_tree'), b)
+    dn = 'uid=%s,%s,%s' % (username, default('user_tree', 'ou=People'), b)
     logger.debug(dn)
 
     # set some default values
@@ -87,12 +87,12 @@ def user_delete(config, b, username):
     """Delete a user from the system"""
     # First delete the user
     try:
-        dn = 'uid=%s,%s,%s' % (username, config.get('default', 'user_tree'), b)
+        dn = 'uid=%s,%s,%s' % (username, default('user_tree', 'ou=People'), b)
         conn.delete_s(dn)
     except Exception as e:
         print(e)
 
-    base_dn = '%s,%s' % (config.get('default', 'group_tree'), b)
+    base_dn = '%s,%s' % (default('group_tree', 'ou=Groups'), b)
     filter = '(memberuid=%s)' % username
     attrs = ['']
     groups = conn.search_s(base_dn, ldap.SCOPE_SUBTREE, filter, attrs)
@@ -107,7 +107,7 @@ def user_delete(config, b, username):
 
     # Next delete the group
     try:
-        dn = 'cn=%s,%s,%s' % (username, config.get('default', 'group_tree'), b)
+        dn = 'cn=%s,%s,%s' % (username, default('group_tree', 'ou=Groups'), b)
         conn.delete_s(dn)
     except Exception as e:
         print(e)
@@ -115,7 +115,7 @@ def user_delete(config, b, username):
 
 def user_list(config, b):
     """List users defined in the system"""
-    base_dn = '%s,%s' % (config.get('default', 'user_tree'), b)
+    base_dn = '%s,%s' % default('user_tree', 'ou=People')), b)
     filter = '(objectclass=person)'
     attrs = ['uid']
     for dn, attrs in conn.search_s(base_dn, ldap.SCOPE_SUBTREE, filter, attrs):
@@ -124,7 +124,7 @@ def user_list(config, b):
 
 def user_modify(config, b, username, **kwargs):
     """Modify a user"""
-    dn = 'uid=%s,%s,%s' % (username, config.get('default', 'user_tree'), b)
+    dn = 'uid=%s,%s,%s' % (username, default('user_tree', 'ou=People'), b)
 
     mod_attrs = []
     for key, value in kwargs.iteritems():
@@ -140,12 +140,12 @@ def user_modify(config, b, username, **kwargs):
 def user_reset(config, b, username, password):
     """Reset a users password"""
     password = make_secret(password)
-    dn = 'uid=%s,%s,%s' % (username, config.get('default', 'user_tree'), b)
+    dn = 'uid=%s,%s,%s' % (username, default('user_tree', 'ou=People'), b)
     conn.passwd_s(dn, None, password)
 
 
 def user_show(config, b, username):
-    base_dn = '%s,%s' % (config.get('default', 'user_tree'), b)
+    base_dn = '%s,%s' % (default('user_tree', 'ou=People'), b)
     filter = '(uid=%s)' % username
     writer = LDIFWriter(sys.stdout)
     for dn, attrs in conn.search_s(base_dn, ldap.SCOPE_SUBTREE, filter):
@@ -154,7 +154,7 @@ def user_show(config, b, username):
 
 def user_uidNumber(config, b, username):
     """Utility function to get the numeric id from a username"""
-    base_dn = '%s,%s' % (config.get('default', 'user_tree'), b)
+    base_dn = '%s,%s' % (default('user_tree', 'ou=People'), b)
     filter = '(uid=%s)' % username
     attrs = ['uidNumber']
     for dn, attrs in conn.search_s(base_dn, ldap.SCOPE_SUBTREE, filter, attrs):
@@ -163,7 +163,7 @@ def user_uidNumber(config, b, username):
 
 def group_list(config, b):
     """List groups defined in the system"""
-    base_dn = '%s,%s' % (config.get('default', 'group_tree'), b)
+    base_dn = '%s,%s' % (default('group_tree', 'ou=Groups'), b)
     filter = '(objectclass=posixGroup)'
     for dn, attrs in conn.search_s(base_dn, ldap.SCOPE_SUBTREE, filter):
         print(attrs['cn'][0])
@@ -173,7 +173,7 @@ def group_delete(config, b, groupname):
     """Delete a user from the system"""
     # First delete the user
     try:
-        dn = 'cn=%s,%s,%s' % (groupname, config.get('default', 'group_tree'), b)
+        dn = 'cn=%s,%s,%s' % (groupname, default('group_tree', 'ou=Groups'), b)
         conn.delete_s(dn)
     except Exception as e:
         print(e)
@@ -185,7 +185,7 @@ def group_add(config, b, groupname, gidNumber):
         gidNumber = increment_gid(config, b)
 
     # first add the group
-    dn = 'cn=%s,%s,%s' % (groupname, config.get('default', 'group_tree'), b)
+    dn = 'cn=%s,%s,%s' % (groupname, default('group_tree', 'ou=Groups'), b)
     add_record = [
      ('objectclass', ['top', 'posixGroup']),
      ('cn', [groupname]),
@@ -196,7 +196,7 @@ def group_add(config, b, groupname, gidNumber):
 
 def group_addusers(config, b, groupname, username):
     """Add users to a group"""
-    dn = 'cn=%s,%s,%s' % (groupname, config.get('default', 'group_tree'), b)
+    dn = 'cn=%s,%s,%s' % (groupname, default('group_tree', 'ou=Groups'), b)
     for name in username:
         try:
             mod_attrs = []
@@ -208,7 +208,7 @@ def group_addusers(config, b, groupname, username):
 
 def group_delusers(config, b, groupname, username):
     """Remove users from a group"""
-    dn = 'cn=%s,%s,%s' % (groupname, config.get('default', 'group_tree'), b)
+    dn = 'cn=%s,%s,%s' % (groupname, default('group_tree', 'ou=Groups'), b)
     mod_attrs = []
     for name in username:
         mod_attrs.append((ldap.MOD_DELETE, 'memberuid', name))
@@ -216,7 +216,7 @@ def group_delusers(config, b, groupname, username):
 
 
 def group_show(config, b, groupname):
-    base_dn = '%s,%s' % (config.get('default', 'group_tree'), b)
+    base_dn = '%s,%s' % (default('group_tree', 'ou=Groups'), b)
     filter = '(cn=%s)' % groupname
     writer = LDIFWriter(sys.stdout)
     for dn, attrs in conn.search_s(base_dn, ldap.SCOPE_SUBTREE, filter):
@@ -273,15 +273,27 @@ def csep(s):
         raise argparse.ArgumentTypeError("Illegal groups value")
 
 
+def default(key, default=''):
+    try:
+        return config.get('default', key)
+    except:
+        return default
+
+
+config = ConfigParser({'user_tree': 'ou=People', 
+                           'group_tree': 'ou=Groups'})
+config.read(["/etc/obol/obol.config", os.path.expanduser('~/.obol.cfg')])
+
 parser = argparse.ArgumentParser(prog='obol',
                                  description='useradd for ldap.')
 
-parser.add_argument('-D', metavar="BIND DN", default='cn=Manager,dc=local')
-parser.add_argument('-w', metavar="BIND PASSWORD")
-parser.add_argument('-H', metavar="HOST", default='ldap://localhost')
-parser.add_argument('-b', metavar="BASE_DN", default='dc=local')
+parser.add_argument('-D', metavar="BIND DN", default=default('bindDN', 'cn=Manager,dc=local'))
+parser.add_argument('-w', metavar="BIND PASSWORD", default=default('password'))
+parser.add_argument('-H', metavar="HOST", default=default('host', 'ldap://localhost'))
+parser.add_argument('-b', metavar="BASE_DN", default=default('baseDN','dc=local'))
 loglevels = [key for key in logging._levelNames if isinstance(key, str)]
-parser.add_argument('--logLevel', choices=loglevels, default='INFO')
+
+parser.add_argument('--logLevel', choices=loglevels, default=default('logLevel', 'INFO'))
 
 subparsers = parser.add_subparsers(help='commands', dest='target')
 
@@ -347,9 +359,6 @@ command = group_commands.add_parser('list', help='list groups')
 
 if __name__ == '__main__':
     global logger
-    config = ConfigParser({'user_tree': 'ou=People', 
-                           'group_tree': 'ou=Groups'})
-    config.read(["/etc/obol/obol.config", os.path.expanduser('~/.obol.cfg')])
 
     logger = logging.getLogger('obol')
     args = parser.parse_args()
@@ -361,7 +370,7 @@ if __name__ == '__main__':
     dn = args.D
     password = args.w
     if not password:
-        password = config.get('default', 'password')
+        password = default('password')
     host = args.H
     conn = ldap.initialize(host)
     conn.simple_bind_s(dn, password)

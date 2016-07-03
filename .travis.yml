@@ -26,3 +26,9 @@ script:
 - obol -w system user add hans
 - obol -w system user list
 
+deploy:
+  provider: pypi
+  user: "Your username"
+  password: "Your password"
+  on:
+    tags: true
