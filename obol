@@ -33,6 +33,37 @@ def make_secret(password):
     return tagged_digest_salt
 
 
+def init(b, group_tree, user_tree):
+    """Initialize the tree"""
+
+    dn = 'ou=%s,%s' % (user_tree, b)
+    add_record = [
+        ('objectclass', ['top', 'organizationalUnit']),
+        ('ou', [user_tree])
+    ]
+    conn.add_s(dn, add_record)
+
+    dn = 'ou=%s,%s' % (group_tree, b)
+    add_record = [
+        ('objectclass', ['top', 'organizationalUnit']),
+        ('ou', [group_tree])
+    ]
+    conn.add_s(dn, add_record)
+
+    dn = 'cn=uid,%s' % b
+    add_record = [
+        ('objectclass', ['uidNext']),
+        ('uidNumber', ['1050'])
+    ]
+    conn.add_s(dn, add_record)
+
+    dn = 'cn=gid,%s' % b
+    add_record = [
+        ('objectclass', ['uidNext']),
+        ('uidNumber', ['150'])
+    ]
+    conn.add_s(dn, add_record)
+
 def user_add(context, b, username, uidNumber, cn, sn, givenName, password,
              shell, groups):
     """Add a user to the LDAP"""
@@ -311,6 +342,11 @@ user_commands = users.add_subparsers(dest='command')
 groups = subparsers.add_parser('group', help='group commands')
 group_commands = groups.add_subparsers(dest='command')
 
+init_cmd = subparsers.add_parser('init', help='initialize a tree')
+init_cmd.add_argument('--user_tree', default=default('user_tree', 'ou=People'))
+init_cmd.add_argument('--group_tree', default=default('group_tree', 'ou=Group'))
+
+
 # Do the user commands
 command = user_commands.add_parser('add', help='add a user')
 command.add_argument('username')
@@ -376,7 +412,6 @@ command.add_argument('username', nargs='+')
 command = group_commands.add_parser('list', help='list groups')
 command.add_argument('--context', default=default('group_tree', 'ou=Group'))
 
-
 if __name__ == '__main__':
     global logger
 
@@ -386,7 +421,8 @@ if __name__ == '__main__':
     logger.addHandler(logging.StreamHandler(sys.stdout))
 
     target = args.target
-    command = args.command
+    if target != 'init':
+        command = args.command
     dn = args.D
     password = args.w
     host = args.H
@@ -394,12 +430,15 @@ if __name__ == '__main__':
     conn.simple_bind_s(dn, password)
     try:
         ldapuser = sys.modules[__name__]
-        fun = getattr(ldapuser, '%s_%s' % (target, command))
+        if target != 'init':
+            fun = getattr(ldapuser, '%s_%s' % (target, command))
+        fun = getattr(ldapuser, 'init')
         args_d = vars(args)
         # delete the connection based attributes
         # as otherwise ldap_modify gets confused
         del args_d['target']
-        del args_d['command']
+        if command in args_d:
+            del args_d['command']
         del args_d['D']
         del args_d['w']
         del args_d['H']
