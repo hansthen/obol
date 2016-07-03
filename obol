@@ -44,10 +44,10 @@ def user_add(config, b, username, uidNumber, cn, sn, givenName, password,
     dn = 'cn=%s,%s,%s' % (username, default('group_tree', 'ou=Groups'), b)
     logger.debug(dn)
     add_record = [
-     ('objectclass', ['top', 'posixGroup']),
-     ('cn', [username]),
-     ('memberuid', [uidNumber]),
-     ('gidNumber', [uidNumber])
+        ('objectclass', ['top', 'posixGroup']),
+        ('cn', [username]),
+        ('memberuid', [uidNumber]),
+        ('gidNumber', [uidNumber])
     ]
     conn.add_s(dn, add_record)
 
@@ -62,15 +62,15 @@ def user_add(config, b, username, uidNumber, cn, sn, givenName, password,
         sn = username
 
     add_record = [
-     ('objectclass', ['top', 'person', 'organizationalPerson',
-                      'inetOrgPerson', 'posixAccount', 'shadowAccount']),
-     ('uid', [username]),
-     ('cn', [cn]),
-     ('sn', [sn]),
-     ('loginShell', [shell]),
-     ('uidNumber', [uidNumber]),
-     ('gidNumber', [uidNumber]),
-     ('homeDirectory', ['/home/%s' % username])
+        ('objectclass', ['top', 'person', 'organizationalPerson',
+                         'inetOrgPerson', 'posixAccount', 'shadowAccount']),
+        ('uid', [username]),
+        ('cn', [cn]),
+        ('sn', [sn]),
+        ('loginShell', [shell]),
+        ('uidNumber', [uidNumber]),
+        ('gidNumber', [uidNumber]),
+        ('homeDirectory', ['/home/%s' % username])
     ]
     if givenName:
         add_record.append(('givenName', [givenName]))
@@ -98,7 +98,7 @@ def user_delete(config, b, username):
     filter = '(memberuid=%s)' % username
     attrs = ['']
     groups = conn.search_s(base_dn, ldap.SCOPE_SUBTREE, filter, attrs)
-    dns = [dn for dn, attrs in groups]
+    dns = [_dn for _dn, _attrs in groups]
 
     try:
         for dn in dns:
@@ -189,9 +189,9 @@ def group_add(config, b, groupname, gidNumber):
     # first add the group
     dn = 'cn=%s,%s,%s' % (groupname, default('group_tree', 'ou=Groups'), b)
     add_record = [
-     ('objectclass', ['top', 'posixGroup']),
-     ('cn', [groupname]),
-     ('gidNumber', [gidNumber])
+        ('objectclass', ['top', 'posixGroup']),
+        ('cn', [groupname]),
+        ('gidNumber', [gidNumber])
     ]
     conn.add_s(dn, add_record)
 
