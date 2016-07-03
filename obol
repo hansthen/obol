@@ -41,7 +41,7 @@ def user_add(config, b, username, uidNumber, cn, sn, givenName, password,
         uidNumber = increment_uid(config, b)
 
     # first add the group
-    dn = 'cn=%s,%s,%s' % (username, default('group_tree', 'ou=Groups'), b)
+    dn = 'cn=%s,%s,%s' % (username, default('group_tree', 'ou=Group'), b)
     logger.debug(dn)
     add_record = [
         ('objectclass', ['top', 'posixGroup']),
@@ -94,7 +94,7 @@ def user_delete(config, b, username):
     except Exception as e:
         print(e)
 
-    base_dn = '%s,%s' % (default('group_tree', 'ou=Groups'), b)
+    base_dn = '%s,%s' % (default('group_tree', 'ou=Group'), b)
     filter = '(memberuid=%s)' % username
     attrs = ['']
     groups = conn.search_s(base_dn, ldap.SCOPE_SUBTREE, filter, attrs)
@@ -109,7 +109,7 @@ def user_delete(config, b, username):
 
     # Next delete the group
     try:
-        dn = 'cn=%s,%s,%s' % (username, default('group_tree', 'ou=Groups'), b)
+        dn = 'cn=%s,%s,%s' % (username, default('group_tree', 'ou=Group'), b)
         conn.delete_s(dn)
     except Exception as e:
         print(e)
@@ -165,7 +165,7 @@ def user_uidNumber(config, b, username):
 
 def group_list(config, b):
     """List groups defined in the system"""
-    base_dn = '%s,%s' % (default('group_tree', 'ou=Groups'), b)
+    base_dn = '%s,%s' % (default('group_tree', 'ou=Group'), b)
     filter = '(objectclass=posixGroup)'
     for dn, attrs in conn.search_s(base_dn, ldap.SCOPE_SUBTREE, filter):
         print(attrs['cn'][0])
@@ -175,7 +175,7 @@ def group_delete(config, b, groupname):
     """Delete a user from the system"""
     # First delete the user
     try:
-        dn = 'cn=%s,%s,%s' % (groupname, default('group_tree', 'ou=Groups'), b)
+        dn = 'cn=%s,%s,%s' % (groupname, default('group_tree', 'ou=Group'), b)
         conn.delete_s(dn)
     except Exception as e:
         print(e)
@@ -187,7 +187,7 @@ def group_add(config, b, groupname, gidNumber):
         gidNumber = increment_gid(config, b)
 
     # first add the group
-    dn = 'cn=%s,%s,%s' % (groupname, default('group_tree', 'ou=Groups'), b)
+    dn = 'cn=%s,%s,%s' % (groupname, default('group_tree', 'ou=Group'), b)
     add_record = [
         ('objectclass', ['top', 'posixGroup']),
         ('cn', [groupname]),
@@ -198,7 +198,7 @@ def group_add(config, b, groupname, gidNumber):
 
 def group_addusers(config, b, groupname, username):
     """Add users to a group"""
-    dn = 'cn=%s,%s,%s' % (groupname, default('group_tree', 'ou=Groups'), b)
+    dn = 'cn=%s,%s,%s' % (groupname, default('group_tree', 'ou=Group'), b)
     for name in username:
         try:
             mod_attrs = []
@@ -210,7 +210,7 @@ def group_addusers(config, b, groupname, username):
 
 def group_delusers(config, b, groupname, username):
     """Remove users from a group"""
-    dn = 'cn=%s,%s,%s' % (groupname, default('group_tree', 'ou=Groups'), b)
+    dn = 'cn=%s,%s,%s' % (groupname, default('group_tree', 'ou=Group'), b)
     mod_attrs = []
     for name in username:
         mod_attrs.append((ldap.MOD_DELETE, 'memberuid', name))
@@ -218,7 +218,7 @@ def group_delusers(config, b, groupname, username):
 
 
 def group_show(config, b, groupname):
-    base_dn = '%s,%s' % (default('group_tree', 'ou=Groups'), b)
+    base_dn = '%s,%s' % (default('group_tree', 'ou=Group'), b)
     filter = '(cn=%s)' % groupname
     writer = LDIFWriter(sys.stdout)
     for dn, attrs in conn.search_s(base_dn, ldap.SCOPE_SUBTREE, filter):
@@ -283,19 +283,19 @@ def default(key, default=''):
 
 
 config = ConfigParser({'user_tree': 'ou=People',
-                       'group_tree': 'ou=Groups'})
-config.read(["/etc/obol/obol.config", os.path.expanduser('~/.obol.cfg')])
+                       'group_tree': 'ou=Group'})
+config.read(['/etc/obol/obol.config', os.path.expanduser('~/.obol.cfg')])
 
 parser = argparse.ArgumentParser(prog='obol',
                                  description='useradd for ldap.')
 
-parser.add_argument('-D', metavar="BIND DN",
+parser.add_argument('-D', metavar='BIND DN',
                     default=default('bindDN', 'cn=Manager,dc=local'))
-parser.add_argument('-w', metavar="BIND PASSWORD",
+parser.add_argument('-w', metavar='BIND PASSWORD',
                     default=default('password'))
-parser.add_argument('-H', metavar="HOST",
+parser.add_argument('-H', metavar='HOST',
                     default=default('host', 'ldap://localhost'))
-parser.add_argument('-b', metavar="BASE_DN",
+parser.add_argument('-b', metavar='BASE_DN',
                     default=default('baseDN', 'dc=local'))
 loglevels = [key for key in logging._levelNames if isinstance(key, str)]
 
