@@ -435,7 +435,8 @@ if __name__ == '__main__':
         ldapuser = sys.modules[__name__]
         if target != 'init':
             fun = getattr(ldapuser, '%s_%s' % (target, command))
-        fun = getattr(ldapuser, 'init')
+        else:
+            fun = getattr(ldapuser, 'init')
         args_d = vars(args)
         # delete the connection based attributes
         # as otherwise ldap_modify gets confused
