@@ -7,10 +7,11 @@ import ldap
 import os
 import hashlib
 from ConfigParser import ConfigParser
-import os
 import logging
 
+
 global logger
+
 
 def make_secret(password):
     """Encodes the given password as a base64 SSHA hash+salt buffer"""
@@ -32,7 +33,8 @@ def make_secret(password):
     return tagged_digest_salt
 
 
-def user_add(config, b, username, uidNumber, cn, sn, givenName, password, shell, groups):
+def user_add(config, b, username, uidNumber, cn, sn, givenName, password,
+             shell, groups):
     """Add a user to the LDAP"""
 
     if not uidNumber:
@@ -115,7 +117,7 @@ def user_delete(config, b, username):
 
 def user_list(config, b):
     """List users defined in the system"""
-    base_dn = '%s,%s' % default('user_tree', 'ou=People')), b)
+    base_dn = '%s,%s' % (default('user_tree', 'ou=People'), b)
     filter = '(objectclass=person)'
     attrs = ['uid']
     for dn, attrs in conn.search_s(base_dn, ldap.SCOPE_SUBTREE, filter, attrs):
@@ -280,20 +282,25 @@ def default(key, default=''):
         return default
 
 
-config = ConfigParser({'user_tree': 'ou=People', 
-                           'group_tree': 'ou=Groups'})
+config = ConfigParser({'user_tree': 'ou=People',
+                       'group_tree': 'ou=Groups'})
 config.read(["/etc/obol/obol.config", os.path.expanduser('~/.obol.cfg')])
 
 parser = argparse.ArgumentParser(prog='obol',
                                  description='useradd for ldap.')
 
-parser.add_argument('-D', metavar="BIND DN", default=default('bindDN', 'cn=Manager,dc=local'))
-parser.add_argument('-w', metavar="BIND PASSWORD", default=default('password'))
-parser.add_argument('-H', metavar="HOST", default=default('host', 'ldap://localhost'))
-parser.add_argument('-b', metavar="BASE_DN", default=default('baseDN','dc=local'))
+parser.add_argument('-D', metavar="BIND DN",
+                    default=default('bindDN', 'cn=Manager,dc=local'))
+parser.add_argument('-w', metavar="BIND PASSWORD",
+                    default=default('password'))
+parser.add_argument('-H', metavar="HOST",
+                    default=default('host', 'ldap://localhost'))
+parser.add_argument('-b', metavar="BASE_DN",
+                    default=default('baseDN', 'dc=local'))
 loglevels = [key for key in logging._levelNames if isinstance(key, str)]
 
-parser.add_argument('--logLevel', choices=loglevels, default=default('logLevel', 'INFO'))
+parser.add_argument('--logLevel', choices=loglevels,
+                    default=default('logLevel', 'INFO'))
 
 subparsers = parser.add_subparsers(help='commands', dest='target')
 
