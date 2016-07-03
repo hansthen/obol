@@ -441,7 +441,7 @@ if __name__ == '__main__':
         # delete the connection based attributes
         # as otherwise ldap_modify gets confused
         del args_d['target']
-        if command in args_d:
+        if 'command' in args_d:
             del args_d['command']
         del args_d['D']
         del args_d['w']
