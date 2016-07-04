@@ -42,14 +42,14 @@ def init(b, group_tree, user_tree):
     ]
 
     conn.add_s(dn, add_record)
-    dn = 'ou=%s,%s' % (user_tree, b)
+    dn = '%s,%s' % (user_tree, b)
     add_record = [
         ('objectclass', ['top', 'organizationalUnit']),
         ('ou', [user_tree])
     ]
     conn.add_s(dn, add_record)
 
-    dn = 'ou=%s,%s' % (group_tree, b)
+    dn = '%s,%s' % (group_tree, b)
     add_record = [
         ('objectclass', ['top', 'organizationalUnit']),
         ('ou', [group_tree])
