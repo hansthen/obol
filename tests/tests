@@ -1,0 +1,40 @@
+#!/usr/bin/env bats
+@test "1.0 - check init method" {
+  obol -w system init
+}
+
+@test "1.1 - check user list method on empty ldap" {
+  obol -w system user list 
+}
+
+@test "1.2 - check user add method" {
+  obol -w system user add test_user1
+  obol -w system user list | grep test_user1
+}
+
+@test "1.3 - check user show method" {
+  obol -w system user show test_user1 | grep test_user1
+}
+
+@test "1.4 - check user delete method" {
+  obol -w system user delete test_user1
+  ! grep test_user1 < obol -w system user list
+}
+
+@test "1.5 - check user if user password is stored hashed" {
+  obol -w system user add test_user2 --password HEELGEWOON
+  obol -w system user show test_user2 | grep userPassword | grep SSHA
+}
+
+@test "1.6 - check if we can add a user to a group" {
+  obol -w system group add users
+  obol -w system group addusers users test_user2
+  obol -w system group show users | grep "memberUid: test_user2" 
+}
+
+@test "2.0 - check if we can cleanup all" {
+  obol -w system user list | xargs obol -w system user delete
+  obol -w system group list | xargs obol -w system group delete
+}
+
+   

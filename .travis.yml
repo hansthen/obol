@@ -14,6 +14,7 @@ before_install:
 - docker run -d --net=host --name ldap pythea/ldap 
 - docker ps -a
 - sudo apt -y install ldap-utils python-flake8
+- git clone https://github.com/sstephenson/bats.git && sudo bats/install.sh /usr/local
 - docker logs ldap
 
 install:
@@ -22,11 +23,7 @@ install:
 
 script:
 - flake8 obol
-- obol -w system init
-- ldapsearch -H ldap:/// -D cn=Manager,dc=local -w system -b dc=local
-- obol -w system user list
-- obol -w system user add hans
-- obol -w system user list
+- bats tests/tests
 
 deploy:
   provider: pypi
