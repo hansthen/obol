@@ -22,10 +22,10 @@ install:
 
 script:
 - flake8 obol
-- obol -w system -D cn=Manager,dc=root -b dc=root init
-- obol -w system -D cn=Manager,dc=root -b dc=root user list
-- obol -w system -D cn=Manager,dc=root -b dc=root user add hans
-- obol -w system -D cn=Manager,dc=root -b dc=root user list
+- obol -w system init
+- obol -w system user list
+- obol -w system user add hans
+- obol -w system user list
 
 deploy:
   provider: pypi
