@@ -1,5 +1,5 @@
 #!/usr/bin/env bats
-PASSWORD=$PASSWORD
+PASSWORD=system
 
 @test "1.0 - check init method" {
   obol -w $PASSWORD init
