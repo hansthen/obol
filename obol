@@ -41,9 +41,9 @@ def init(b, group_tree, user_tree):
     add_record = [
         ('objectclass', ['domain']),
     ]
+    conn.add_s(dn, add_record)
     """
 
-    conn.add_s(dn, add_record)
     dn = '%s,%s' % (user_tree, b)
     add_record = [
         ('objectclass', ['top', 'organizationalUnit']),
