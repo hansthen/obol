@@ -36,7 +36,7 @@ def make_secret(password):
 def init(b, group_tree, user_tree):
     """Initialize the tree"""
 
-    dn = '%s' % (user_tree, b)
+    dn = '%s' % (b)
     add_record = [
         ('objectclass', ['domain']),
     ]
