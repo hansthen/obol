@@ -9,28 +9,6 @@ from cliff.command import Command
 global logger
 
 
-class UserShow(Command):
-    """Show a user"""
-    def get_parser(self, name):
-        parser = super(UserShow, self).get_parser(name)
-        parser.add_argument('username')
-        parser.add_argument('--subtree',
-                            default=self.app.default('user_tree', 'ou=People'))
-        return parser
-
-    def take_action(self, args):
-        username = args.username
-        context = args.subtree
-        b = self.app.options.b
-        conn = self.app.conn
-
-        base_dn = '%s,%s' % (context, b)
-        filter = '(uid=%s)' % username
-        writer = LDIFWriter(sys.stdout)
-        for dn, attrs in conn.search_s(base_dn, ldap.SCOPE_SUBTREE, filter):
-            writer.unparse(dn, attrs)
-
-
 class GroupList(Command):
     """List Users"""
     def get_parser(self, name):
