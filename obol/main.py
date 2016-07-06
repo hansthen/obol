@@ -27,6 +27,8 @@ class ObolApp(App):
         manager.add_command('group add', group.GroupAdd)
         manager.add_command('group useradd', group.GroupAddUsers)
         manager.add_command('group userdel', group.GroupDelUsers)
+        manager.add_command('group addusers', group.GroupAddUsers)
+        manager.add_command('group delusers', group.GroupDelUsers)
 
         super(ObolApp, self).__init__(
             description='Obol: LDAP command line tool',
