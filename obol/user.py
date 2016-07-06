@@ -9,8 +9,8 @@ import logging
 
 from cliff.command import Command
 
-
 logger = logging.getLogger(__name__)
+
 
 def make_secret(password):
     """Encodes the given password as a base64 SSHA hash+salt buffer"""
