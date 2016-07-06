@@ -45,6 +45,7 @@ class ObolApp(App):
         self.config = config
 
     def default(self, key, default=''):
+        """A utility function to retrieve defaults from a config file"""
         try:
             return self.config.get('default', key)
         except:

@@ -24,7 +24,7 @@ class GroupList(Command):
 
         base_dn = '%s,%s' % (context, b)
         filter = '(objectclass=posixGroup)'
-        for dn, attrs in conn.search_s(base_dn, ldap.SCOPE_SUBTREE, filter):
+        for _, attrs in conn.search_s(base_dn, ldap.SCOPE_SUBTREE, filter):
             print(attrs['cn'][0])
 
 

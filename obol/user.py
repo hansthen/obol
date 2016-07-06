@@ -114,6 +114,8 @@ class UserAdd(Command):
         parser.add_argument('username')
         parser.add_argument('--subtree',
                             default=self.app.default('user_tree', 'ou=People'))
+        parser.add_argument('--grouptree',
+                            default=self.app.default('group_tree', 'ou=Group'))
         parser.add_argument('--uidNumber')
         parser.add_argument('--password')
         parser.add_argument('--cn', metavar="COMMON NAME")
@@ -136,6 +138,7 @@ class UserAdd(Command):
         context = args.subtree
         shell = args.shell
         groups = args.groups
+        grouptree = args.grouptree
         conn = self.app.conn
 
         if not uidNumber:
@@ -185,8 +188,14 @@ class UserAdd(Command):
 
         if groups:
             for group in groups:
-                # group_addusers(context, b, group, [username])
-                pass
+                dn = 'cn=%s,%s,%s' % (group, grouptree, b)
+                try:
+                    mod_attrs = []
+                    mod_attrs.append((ldap.MOD_ADD, 'memberuid', username))
+                    conn.modify_s(dn, mod_attrs)
+                except Exception as error:
+                    print("Error adding %s to %s: %s" %
+                          (username, group, error))
 
 
 class UserDelete(Command):
@@ -252,8 +261,8 @@ class UserList(Command):
         base_dn = '%s,%s' % (context, b)
         filter = '(objectclass=person)'
         attrs = ['uid']
-        for dn, attrs in conn.search_s(base_dn,
-                                       ldap.SCOPE_SUBTREE, filter, attrs):
+        for _, attrs in conn.search_s(base_dn,
+                                      ldap.SCOPE_SUBTREE, filter, attrs):
             print(attrs['uid'][0])
 
 
