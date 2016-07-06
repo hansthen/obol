@@ -14,10 +14,13 @@ before_install:
 - docker logs ldap
 install:
 - pip install -r requirements.txt
+- pip install codecov
 - sudo python setup.py -q install
 script:
 - flake8 obol
 - bats tests/tests
+after_success:
+- codecov
 deploy:
   provider: pypi
   user: hans.then
