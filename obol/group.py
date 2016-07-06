@@ -6,8 +6,6 @@ import ldap
 
 from cliff.command import Command
 
-global logger
-
 
 class GroupList(Command):
     """List Users"""
