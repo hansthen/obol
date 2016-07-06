@@ -94,7 +94,7 @@ class UserAdd(Command):
         """Generate a new userid"""
         conn = self.app.conn
         dn = 'cn=uid,%s' % b
-        filter = 'objectclass=counter'
+        filter = 'objectclass=*'
         attrs = ['uidNumber']
 
         try:
