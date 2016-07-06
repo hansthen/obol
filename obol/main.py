@@ -25,6 +25,7 @@ class ObolApp(App):
         manager.add_command('group show', group.GroupShow)
         manager.add_command('group list', group.GroupList)
         manager.add_command('group add', group.GroupAdd)
+        manager.add_command('group delete', group.GroupDelete)
         manager.add_command('group useradd', group.GroupAddUsers)
         manager.add_command('group userdel', group.GroupDelUsers)
         manager.add_command('group addusers', group.GroupAddUsers)
