@@ -6,7 +6,7 @@ def read(fname):
 
 setup(
   name = 'obol',
-  version = '2.0.3',
+  version = '2.0.4',
   description = 'useradd for ldap',
   author = 'Hans Then',
   author_email = 'hans.then@gmail.com',
